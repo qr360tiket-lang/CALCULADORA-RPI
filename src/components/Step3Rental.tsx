@@ -1,0 +1,626 @@
+import React, { useState } from 'react';
+import { 
+  Receipt, 
+  Home, 
+  Sparkles, 
+  ShieldCheck, 
+  Plus, 
+  Trash2, 
+  ChevronRight, 
+  ChevronLeft,
+  Percent,
+  CalendarCheck,
+  Building,
+  Wrench,
+  HelpCircle,
+  Coins
+} from 'lucide-react';
+import { PropertyData, FinancialCalculationResult, RentalStrategyType } from '../types/realEstate';
+import { formatCurrency, formatPct } from '../utils/formatters';
+import { InfoTooltip } from './InfoTooltip';
+
+interface Step3RentalProps {
+  property: PropertyData;
+  results: FinancialCalculationResult;
+  onChange: (updated: Partial<PropertyData>) => void;
+  onPrev: () => void;
+  onNext: () => void;
+}
+
+export const Step3Rental: React.FC<Step3RentalProps> = ({
+  property,
+  results,
+  onChange,
+  onPrev,
+  onNext,
+}) => {
+  const isTraditional = property.rentalStrategy === 'tradicional';
+  const [newExpenseName, setNewExpenseName] = useState('');
+  const [newExpenseAmount, setNewExpenseAmount] = useState('');
+  const [showAddCustomExp, setShowAddCustomExp] = useState(false);
+
+  const handleAddCustomExpense = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newExpenseName.trim() || isNaN(Number(newExpenseAmount))) return;
+    const newItems = [
+      ...property.customRecurringExpenses,
+      {
+        id: `rec-${Date.now()}`,
+        name: newExpenseName.trim(),
+        amount: Math.max(0, Number(newExpenseAmount)),
+        enabled: true,
+      },
+    ];
+    onChange({ customRecurringExpenses: newItems });
+    setNewExpenseName('');
+    setNewExpenseAmount('');
+    setShowAddCustomExp(false);
+  };
+
+  const handleRemoveCustomExpense = (id: string) => {
+    const newItems = property.customRecurringExpenses.filter(e => e.id !== id);
+    onChange({ customRecurringExpenses: newItems });
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-200">
+      
+      {/* Intro Header */}
+      <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span className="text-[11px] font-mono uppercase tracking-widest text-[#D8B66D] font-bold">
+            Paso 3 de 4 · Generación de Renta & Costos de Operación
+          </span>
+          <h2 className="font-serif-title text-2xl font-bold text-[#091C2C] mt-1">
+            Estrategia de Renta y Gastos Recurrentes
+          </h2>
+          <p className="text-xs sm:text-sm text-[#6F6456] mt-1 max-w-2xl">
+            Modela tus flujos de ingreso por alquiler (Tradicional vs Airbnb) y descuenta los gastos reales: mantenimiento de edificio, predial/arbitrios y el 5% de SUNAT (1ra Categoría).
+          </p>
+        </div>
+
+        {/* Live Gross Revenue Badge */}
+        <div className="p-3 bg-[#FBF9F5] rounded-xl border border-[#DDD5C3] text-right">
+          <span className="text-[11px] text-[#6F6456] block">Ingreso Bruto Mensual</span>
+          <span className="font-mono font-bold text-base text-[#091C2C]">
+            {formatCurrency(results.grossMonthlyIncome, property.currency)}
+          </span>
+        </div>
+      </div>
+
+      {/* Rental Strategy Selector: Traditional vs Airbnb */}
+      <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs space-y-4">
+        <label className="block text-xs font-bold text-[#091C2C] uppercase tracking-wider">
+          Estrategia de Explotación del Inmueble
+        </label>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          {/* Strategy A: Tradicional */}
+          <button
+            type="button"
+            onClick={() => onChange({ rentalStrategy: 'tradicional' })}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              isTraditional
+                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md'
+                : 'bg-[#FBF9F5] text-[#091C2C] border-[#DDD5C3] hover:border-[#D8B66D]'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Home className={`w-5 h-5 ${isTraditional ? 'text-[#D8B66D]' : 'text-[#091C2C]'}`} />
+                <span className="font-serif-title font-bold text-base">
+                  Renta Tradicional (Largo Plazo)
+                </span>
+              </div>
+              {isTraditional && (
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#D8B66D] text-[#091C2C] font-bold">
+                  Activo
+                </span>
+              )}
+            </div>
+            <p className={`text-xs ${isTraditional ? 'text-[#DDD5C3]' : 'text-[#6F6456]'}`}>
+              Contrato de 1 a 2 años con inquilino fijo. Flujo de caja predecible, menor desgaste y bajo costo de gestión.
+            </p>
+          </button>
+
+          {/* Strategy B: Airbnb */}
+          <button
+            type="button"
+            onClick={() => onChange({ rentalStrategy: 'airbnb' })}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              !isTraditional
+                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md'
+                : 'bg-[#FBF9F5] text-[#091C2C] border-[#DDD5C3] hover:border-[#D8B66D]'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className={`w-5 h-5 ${!isTraditional ? 'text-[#D8B66D]' : 'text-[#091C2C]'}`} />
+                <span className="font-serif-title font-bold text-base">
+                  Renta Corta / Airbnb / Booking
+                </span>
+              </div>
+              {!isTraditional && (
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#D8B66D] text-[#091C2C] font-bold">
+                  Activo
+                </span>
+              )}
+            </div>
+            <p className={`text-xs ${!isTraditional ? 'text-[#DDD5C3]' : 'text-[#6F6456]'}`}>
+              Alquiler por noche para turismo y ejecutivos. Mayor potencial de ingresos brutos, pero requiere limpieza y gestión continua.
+            </p>
+          </button>
+
+        </div>
+      </div>
+
+      {/* Strategy Detail Parameters */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Card Left: Revenue Parameters */}
+        <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-[#DDD5C3]/40">
+            <Coins className="w-5 h-5 text-[#D8B66D]" />
+            <h3 className="font-serif-title font-bold text-lg text-[#091C2C]">
+              {isTraditional ? 'Parámetros de Alquiler Tradicional' : 'Parámetros de Renta Vacacional / Airbnb'}
+            </h3>
+          </div>
+
+          {isTraditional ? (
+            /* Traditional inputs */
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#091C2C] mb-1.5 flex items-center justify-between">
+                  <span>Alquiler mensual pactado</span>
+                  <span className="text-[10px] text-[#6F6456] font-normal">Valor de mercado</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-[#D8B66D]">
+                    {property.currency === 'USD' ? '$' : 'S/.'}
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={property.traditionalRentMonthly || ''}
+                    onChange={(e) => onChange({ traditionalRentMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-base font-bold text-[#091C2C] focus:bg-white focus:outline-none focus:border-[#D8B66D]"
+                    placeholder="ej. 2200"
+                  />
+                </div>
+              </div>
+
+              {/* Vacancy Rate */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-[#091C2C] flex items-center gap-1">
+                    Tasa de Vacancia estimada
+                    <InfoTooltip 
+                      title="Tasa de Vacancia Inmobiliaria"
+                      content="Porcentaje del año que el inmueble pasa desocupado entre contratos. Un estándar prudente en Lima es de 5% a 8% (equivale a ~1 mes de desocupación cada 1.5 a 2 años)."
+                    />
+                  </label>
+                  <span className="text-xs font-mono font-bold text-[#091C2C]">{property.vacancyRatePct}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="25"
+                  step="1"
+                  value={property.vacancyRatePct}
+                  onChange={(e) => onChange({ vacancyRatePct: Number(e.target.value) })}
+                  className="w-full accent-[#091C2C] cursor-pointer"
+                />
+                <div className="flex justify-between text-[11px] text-[#6F6456] font-mono mt-1">
+                  <span>0% (Continuo)</span>
+                  <span>Pérdida por vacancia: -{formatCurrency(results.vacancyLossMonthly, property.currency)}/mes</span>
+                  <span>25% (3 meses/año)</span>
+                </div>
+              </div>
+
+              {/* Net effective income display */}
+              <div className="p-3 bg-[#F6F4EF] rounded-xl border border-[#DDD5C3] flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#091C2C]">Ingreso Bruto Efectivo (después de vacancia):</span>
+                <span className="font-mono font-bold text-sm text-[#091C2C]">
+                  {formatCurrency(results.effectiveGrossMonthlyIncome, property.currency)} / mes
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Airbnb inputs */
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#091C2C] mb-1">
+                    Tarifa promedio por noche (ADR)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono font-bold text-[#D8B66D]">
+                      {property.currency === 'USD' ? '$' : 'S/.'}
+                    </span>
+                    <input
+                      type="number"
+                      min="10"
+                      value={property.airbnbPricePerNight || ''}
+                      onChange={(e) => onChange({ airbnbPricePerNight: Math.max(0, parseFloat(e.target.value) || 0) })}
+                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-sm font-bold text-[#091C2C] focus:bg-white focus:outline-none focus:border-[#D8B66D]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-[#091C2C]">
+                      Ocupación mensual
+                    </label>
+                    <span className="text-xs font-mono font-bold text-[#091C2C]">{property.airbnbOccupancyPct}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="95"
+                    step="1"
+                    value={property.airbnbOccupancyPct}
+                    onChange={(e) => onChange({ airbnbOccupancyPct: Number(e.target.value) })}
+                    className="w-full accent-[#091C2C] cursor-pointer mt-2"
+                  />
+                  <span className="text-[10px] text-[#6F6456] font-mono block text-right">
+                    ~{(30.4 * property.airbnbOccupancyPct / 100).toFixed(0)} noches ocupadas
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#091C2C] mb-1">
+                    Comisión de plataforma (Airbnb)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={property.airbnbPlatformFeePct}
+                      onChange={(e) => onChange({ airbnbPlatformFeePct: Math.max(0, parseFloat(e.target.value) || 0) })}
+                      className="w-20 px-2 py-1.5 rounded-lg border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-xs font-bold text-[#091C2C]"
+                    />
+                    <span className="text-xs font-bold text-[#6F6456]">% (3% host split fee)</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#091C2C] mb-1">
+                    Limpieza cobrada al huésped / mes
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-[#D8B66D]">
+                      {property.currency === 'USD' ? '$' : 'S/.'}
+                    </span>
+                    <input
+                      type="number"
+                      value={property.airbnbCleaningFeePerMonth || ''}
+                      onChange={(e) => onChange({ airbnbCleaningFeePerMonth: Math.max(0, parseFloat(e.target.value) || 0) })}
+                      className="w-full pl-8 pr-2 py-1.5 rounded-lg border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-xs font-bold text-[#091C2C]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-[#F6F4EF] rounded-xl border border-[#DDD5C3] flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#091C2C]">Ingreso Bruto Efectivo Airbnb (neto plataforma):</span>
+                <span className="font-mono font-bold text-sm text-[#091C2C]">
+                  {formatCurrency(results.effectiveGrossMonthlyIncome, property.currency)} / mes
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* SUNAT 1st Category 5% Tax Box */}
+          <div className="p-4 rounded-xl bg-[#FBF9F5] border border-[#DDD5C3] space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#D8B66D]" />
+                <span className="text-xs font-bold text-[#091C2C]">
+                  Impuesto a la Renta de 1ra Categoría (SUNAT)
+                </span>
+                <InfoTooltip 
+                  title="Impuesto a la Renta SUNAT - 1ra Categoría"
+                  content="En el Perú, el arrendamiento de predios por parte de personas naturales tributa con una tasa efectiva del 5% del importe bruto del alquiler. Se paga mensualmente mediante el Formulario Virtual N° 1683 o Guía de Arrendamiento."
+                  badge="5% SUNAT"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={property.sunatFirstCatTaxEnabled}
+                  onChange={(e) => onChange({ sunatFirstCatTaxEnabled: e.target.checked })}
+                  className="rounded text-[#091C2C] focus:ring-[#D8B66D]"
+                />
+                <span className="text-xs font-semibold text-[#091C2C]">
+                  Deducir el 5%
+                </span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between text-xs pt-1">
+              <span className="text-[#6F6456]">
+                {property.sunatFirstCatTaxEnabled ? 'Monto a pagar mensualmente a SUNAT:' : 'No deducido del cálculo'}
+              </span>
+              <span className={`font-mono font-bold text-xs ${property.sunatFirstCatTaxEnabled ? 'text-[#091C2C]' : 'text-gray-400'}`}>
+                {formatCurrency(results.sunatTaxMonthly, property.currency)} / mes
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Card Right: Operating Expenses */}
+        <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-[#DDD5C3]/40">
+            <div className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-[#D8B66D]" />
+              <h3 className="font-serif-title font-bold text-lg text-[#091C2C]">
+                Gastos Operativos Mensuales (OpEx)
+              </h3>
+            </div>
+            <span className="text-xs font-mono font-bold text-[#091C2C] bg-[#F6F4EF] px-2 py-1 rounded-md border border-[#DDD5C3]">
+              Total: {formatCurrency(results.totalOperatingExpensesMonthly, property.currency)}/m
+            </span>
+          </div>
+
+          <div className="space-y-3.5 text-xs">
+            
+            {/* 1. Mantenimiento del Edificio */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <label className="font-semibold text-[#091C2C] flex items-center gap-1">
+                  Mantenimiento Edificio / Condominio
+                  <InfoTooltip 
+                    title="Mantenimiento de Edificio"
+                    content="Cuota de la junta de propietarios para vigilancia 24/7, limpieza de áreas comunes, ascensores y bombas de agua."
+                  />
+                </label>
+                <span className="text-[11px] text-[#6F6456]">Portería, luz áreas comunes, limpieza</span>
+              </div>
+              <div className="relative w-32">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
+                  {property.currency === 'USD' ? '$' : 'S/.'}
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  value={property.maintenanceFeeMonthly || ''}
+                  onChange={(e) => onChange({ maintenanceFeeMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
+                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg focus:bg-white"
+                  placeholder="ej. 200"
+                />
+              </div>
+            </div>
+
+            {/* 2. Predial y Arbitrios */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#DDD5C3]/30">
+              <div className="flex-1">
+                <label className="font-semibold text-[#091C2C] flex items-center gap-1">
+                  Impuesto Predial y Arbitrios (Prorrateado)
+                  <InfoTooltip 
+                    title="Impuesto Predial y Arbitrios Municipales"
+                    content="Tributos pagados a la municipalidad distrital (SAT en Lima o municipalidad local). Se prorratea el monto anual entre 12 meses."
+                  />
+                </label>
+                <span className="text-[11px] text-[#6F6456]">Municipalidad del distrito (SAT) al mes</span>
+              </div>
+              <div className="relative w-32">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
+                  {property.currency === 'USD' ? '$' : 'S/.'}
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  value={property.propertyTaxAndArbitriosMonthly || ''}
+                  onChange={(e) => onChange({ propertyTaxAndArbitriosMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
+                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg focus:bg-white"
+                  placeholder="ej. 80"
+                />
+              </div>
+            </div>
+
+            {/* 3. Reserva de Reparaciones (%) */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#DDD5C3]/30">
+              <div className="flex-1">
+                <label className="font-semibold text-[#091C2C] flex items-center gap-1">
+                  Reserva para Reparaciones & Desgaste
+                  <InfoTooltip 
+                    title="Reserva de Contingencia"
+                    content="Fondo para pintura, griferías, electrodomésticos y reparaciones fortuitas. Se recomienda separar del 3% al 8% de la renta mensual."
+                  />
+                </label>
+                <span className="text-[11px] text-[#6F6456]">
+                  {property.repairsReservePct}% de la renta ({formatCurrency(results.repairsReserveMonthly, property.currency)}/mes)
+                </span>
+              </div>
+              <div className="flex items-center gap-1 w-32 justify-end">
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  value={property.repairsReservePct}
+                  onChange={(e) => onChange({ repairsReservePct: Math.max(0, parseFloat(e.target.value) || 0) })}
+                  className="w-16 px-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg"
+                />
+                <span className="font-bold text-[#091C2C]">%</span>
+              </div>
+            </div>
+
+            {/* 4. Comisión de Administración / Property Manager (%) */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#DDD5C3]/30">
+              <div className="flex-1">
+                <label className="font-semibold text-[#091C2C]">
+                  Comisión Property Manager / Co-anfitrión
+                </label>
+                <span className="text-[11px] text-[#6F6456]">
+                  {property.managementFeePct}% ({formatCurrency(results.managementFeeMonthly, property.currency)}/mes)
+                </span>
+              </div>
+              <div className="flex items-center gap-1 w-32 justify-end">
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  value={property.managementFeePct}
+                  onChange={(e) => onChange({ managementFeePct: Math.max(0, parseFloat(e.target.value) || 0) })}
+                  className="w-16 px-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg"
+                />
+                <span className="font-bold text-[#091C2C]">%</span>
+              </div>
+            </div>
+
+            {/* 5. Servicios (Luz, agua, internet) - especial Airbnb */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#DDD5C3]/30">
+              <div className="flex-1">
+                <label className="font-semibold text-[#091C2C]">
+                  Servicios Públicos (Luz, Agua, Internet)
+                </label>
+                <span className="text-[11px] text-[#6F6456]">Asumido por anfitrión en Airbnb o alquiler todo incluido</span>
+              </div>
+              <div className="relative w-32">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
+                  {property.currency === 'USD' ? '$' : 'S/.'}
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  value={property.utilitiesMonthly || ''}
+                  onChange={(e) => onChange({ utilitiesMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
+                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            {/* Custom Recurring Expenses */}
+            {property.customRecurringExpenses.map((exp) => (
+              <div key={exp.id} className="flex items-center justify-between gap-3 pt-2 border-t border-[#DDD5C3]/30">
+                <div className="flex-1 flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={exp.enabled}
+                    onChange={(e) => {
+                      const updated = property.customRecurringExpenses.map(item => 
+                        item.id === exp.id ? { ...item, enabled: e.target.checked } : item
+                      );
+                      onChange({ customRecurringExpenses: updated });
+                    }}
+                    className="rounded text-[#091C2C]"
+                  />
+                  <span className="font-semibold text-[#091C2C] truncate">{exp.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-xs text-[#091C2C]">
+                    {formatCurrency(exp.amount, property.currency)}/m
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCustomExpense(exp.id)}
+                    className="text-gray-400 hover:text-red-500 p-0.5"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Add custom recurring expense button */}
+            <div className="pt-2">
+              {!showAddCustomExp ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAddCustomExp(true)}
+                  className="text-xs font-semibold text-[#091C2C] hover:text-[#D8B66D] flex items-center gap-1 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Agregar otro gasto mensual recurrente</span>
+                </button>
+              ) : (
+                <form onSubmit={handleAddCustomExpense} className="p-2.5 bg-[#FBF9F5] rounded-xl border border-[#D8B66D] space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Nombre (ej. Seguro multirriesgo)"
+                      value={newExpenseName}
+                      onChange={(e) => setNewExpenseName(e.target.value)}
+                      className="px-2 py-1 text-xs bg-white rounded border border-[#DDD5C3]"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Monto mensual"
+                      value={newExpenseAmount}
+                      onChange={(e) => setNewExpenseAmount(e.target.value)}
+                      className="px-2 py-1 text-xs font-mono bg-white rounded border border-[#DDD5C3]"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCustomExp(false)}
+                      className="text-[11px] text-[#6F6456] px-2 py-0.5"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="text-[11px] bg-[#091C2C] text-[#F6F4EF] font-bold px-3 py-0.5 rounded"
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+
+          </div>
+
+          {/* NOI Preview Box */}
+          <div className="p-4 rounded-xl bg-[#091C2C] text-[#F6F4EF] flex items-center justify-between">
+            <div>
+              <span className="text-[11px] text-[#D8B66D] uppercase tracking-wider font-mono block">
+                Ingreso Operativo Neto (NOI)
+              </span>
+              <span className="text-[11px] text-[#DDD5C3]">
+                Flujo libre generado por la propiedad antes de pagar deuda
+              </span>
+            </div>
+            <div className="font-mono text-xl font-bold text-white">
+              {formatCurrency(results.netOperatingIncomeMonthly, property.currency)}
+              <span className="text-xs text-[#DDD5C3] font-normal">/m</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Navigation Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-[#DDD5C3]/40">
+        <button
+          type="button"
+          onClick={onPrev}
+          className="px-5 py-2.5 rounded-xl border border-[#DDD5C3] bg-white hover:bg-[#F6F4EF] text-[#091C2C] font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Volver al Paso 2: Hipoteca</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onNext}
+          className="px-6 py-2.5 rounded-xl bg-[#091C2C] hover:bg-[#15344f] text-[#F6F4EF] font-bold text-xs flex items-center gap-1.5 shadow-md transition-colors cursor-pointer"
+        >
+          <span>Continuar al Paso 4: Resultados & Rentabilidad</span>
+          <ChevronRight className="w-4 h-4 text-[#D8B66D]" />
+        </button>
+      </div>
+
+    </div>
+  );
+};

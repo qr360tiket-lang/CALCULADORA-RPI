@@ -1,0 +1,6 @@
+{
+  "name": "Calculadora Inmobiliaria Perú: Rentabilidad y Cash Flow",
+  "description": "Calculadora profesional de rentabilidad inmobiliaria y cash flow adaptada al mercado peruano con Alcabala (10 UIT), hipotecas, SUNAT y Airbnb.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
