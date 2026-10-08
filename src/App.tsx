@@ -227,9 +227,18 @@ export default function App() {
                 results={results}
                 onChange={handleUpdateProperty}
                 onPrev={() => setCurrentStep(2)}
-                onNext={() => {
-                  setActiveTab('dashboard');
-                }}
+                onNext={() => setCurrentStep(4)}
+              />
+            )}
+
+            {currentStep === 4 && (
+              <Step4Results
+                property={currentProperty}
+                results={results}
+                onPrev={() => setCurrentStep(3)}
+                onOpenSensitivity={() => setShowSensitivity(true)}
+                onOpenExport={() => setShowExport(true)}
+                onGoToComparison={() => setActiveTab('comparison')}
               />
             )}
           </div>

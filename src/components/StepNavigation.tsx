@@ -48,23 +48,30 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
     {
       id: 1,
       number: '1',
-      title: '1. Tu propiedad',
-      subtitle: 'Identificación, precio y costos in...',
+      title: '1. Tu Propiedad',
+      subtitle: 'Precio, inicial y gastos de cierre',
       icon: Home,
     },
     {
       id: 2,
       number: '2',
-      title: '2. Tus números',
-      subtitle: 'Financiación, cuotas, renta y vac...',
+      title: '2. Tus Números',
+      subtitle: 'Hipoteca, TEA y cuota bancaria',
       icon: Calculator,
     },
     {
       id: 3,
       number: '3',
-      title: '3. Tu análisis',
-      subtitle: 'Flujo de caja, rendimientos y de...',
+      title: '3. Renta y Gastos',
+      subtitle: 'Alquiler mensual, Airbnb y SUNAT',
       icon: BarChart3,
+    },
+    {
+      id: 4,
+      number: '4',
+      title: '4. Rentabilidad',
+      subtitle: 'Cash Flow, Cap Rate y payback',
+      icon: LayoutDashboard,
     },
   ];
 
@@ -72,8 +79,8 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
     <div className="bg-[#F8F7F3] border-b border-[#DDD5C3]/70 py-3 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         
-        {/* Step Buttons (Cards) */}
-        <div className="flex flex-wrap sm:flex-nowrap items-stretch gap-2.5 flex-1">
+        {/* Step Buttons (Cards) with High-Contrast Vivid Colors */}
+        <div className="flex flex-wrap sm:flex-nowrap items-stretch gap-2 flex-1">
           {steps.map((s) => {
             const Icon = s.icon;
             const isActive = activeTab === 'wizard' && currentStep === s.id;
@@ -86,27 +93,35 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
                   setActiveTab('wizard');
                   onSelectStep(s.id);
                 }}
-                className={`flex-1 min-w-[200px] p-2.5 sm:p-3 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
+                className={`flex-1 min-w-[150px] p-2.5 sm:p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 cursor-pointer select-none ${
                   isActive
-                    ? 'bg-[#081827] text-white border-[#081827] shadow-md ring-2 ring-[#D8B66D]/40'
-                    : 'bg-white hover:bg-[#F2EFE9] border-[#DDD5C3] text-[#081827]'
+                    ? 'bg-gradient-to-r from-[#0284C7] via-[#0EA5E9] to-[#38BDF8] text-white border-white shadow-xl ring-4 ring-[#0284C7]/60 scale-[1.02] z-10'
+                    : 'bg-white hover:bg-[#F8FAFC] border-[#CBD5E1] text-[#334155] hover:border-[#94A3B8] shadow-xs'
                 }`}
               >
-                {/* Step Icon */}
-                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                {/* Step Number & Icon Badge */}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                   isActive
-                    ? 'bg-[#E5B55E] text-[#081827]'
-                    : 'bg-[#F4F0E6] text-[#6E6353] border border-[#DDD5C3]/60'
+                    ? 'bg-white text-[#0284C7] shadow-md font-black text-sm'
+                    : 'bg-[#F1F5F9] text-[#64748B] border border-[#CBD5E1]/60 font-bold text-xs'
                 }`}>
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                 </div>
 
                 {/* Step Titles */}
-                <div className="truncate">
-                  <div className={`font-bold text-xs sm:text-sm truncate ${isActive ? 'text-white' : 'text-[#081827]'}`}>
-                    {s.title}
+                <div className="truncate flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <div className={`font-black text-xs sm:text-sm truncate ${isActive ? 'text-white drop-shadow-xs' : 'text-[#0F172A]'}`}>
+                      {s.title}
+                    </div>
+                    {isActive && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-white text-[#0284C7] text-[9px] font-black uppercase font-mono tracking-wider shrink-0 shadow-xs flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-pulse"></span>
+                        AQUÍ
+                      </span>
+                    )}
                   </div>
-                  <div className={`text-[11px] truncate ${isActive ? 'text-[#D8B66D]' : 'text-[#7A6D5D]'}`}>
+                  <div className={`text-[10px] sm:text-[11px] truncate ${isActive ? 'text-white/95 font-medium' : 'text-[#64748B]'}`}>
                     {s.subtitle}
                   </div>
                 </div>
@@ -120,19 +135,19 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
             onClick={() => setActiveTab(activeTab === 'dashboard' ? 'wizard' : 'dashboard')}
             className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'dashboard'
-                ? 'bg-[#081827] text-white border-[#081827] shadow-md ring-2 ring-[#D8B66D]/40'
+                ? 'bg-gradient-to-r from-[#0284C7] via-[#0EA5E9] to-[#38BDF8] text-white border-white shadow-xl ring-4 ring-[#0284C7]/60 scale-[1.02]'
                 : 'bg-white hover:bg-[#F2EFE9] border-[#DDD5C3] text-[#081827]'
             }`}
             title="Ver vista completa de todas las métricas juntas"
           >
-            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              activeTab === 'dashboard' ? 'bg-[#E5B55E] text-[#081827]' : 'bg-[#F4F0E6] text-[#6E6353]'
+            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${
+              activeTab === 'dashboard' ? 'bg-white text-[#0284C7] shadow-md' : 'bg-[#F4F0E6] text-[#6E6353]'
             }`}>
               <LayoutDashboard className="w-4 h-4" />
             </div>
             <div className="hidden xl:block">
-              <div className="font-bold text-xs">Resumen</div>
-              <div className="text-[11px] text-[#7A6D5D]">Vista integral</div>
+              <div className={`font-bold text-xs ${activeTab === 'dashboard' ? 'text-white' : 'text-[#081827]'}`}>Resumen</div>
+              <div className={`text-[11px] ${activeTab === 'dashboard' ? 'text-white/90' : 'text-[#7A6D5D]'}`}>Vista integral</div>
             </div>
           </button>
         </div>

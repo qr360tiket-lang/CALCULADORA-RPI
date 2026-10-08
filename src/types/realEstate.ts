@@ -39,7 +39,7 @@ export interface PropertyData {
 
   // Peruvian Closing Costs (Paso 1)
   isFirstSaleConstructor: boolean; // Si es primera venta de constructora / bien futuro, está exonerado de Alcabala
-  uitValuePen: number; // Valor UIT (ej. S/. 5,350)
+  uitValuePen: number; // Valor UIT (ej. S/. 5,500 - 10 UIT = S/. 55,000)
   customAlcabala: number | null; // Si el usuario prefiere ingresar monto manual
   manualAlcabalaEnabled: boolean;
   notaryFee: number;

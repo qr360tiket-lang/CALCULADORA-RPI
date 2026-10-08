@@ -12,6 +12,7 @@ import {
 import { PropertyData, FinancialCalculationResult, FinancingMode } from '../types/realEstate';
 import { formatCurrency, formatPct } from '../utils/formatters';
 import { InfoTooltip } from './InfoTooltip';
+import { EditablePriceInput } from './EditablePriceInput';
 
 interface Step2MortgageProps {
   property: PropertyData;
@@ -35,26 +36,63 @@ export const Step2Mortgage: React.FC<Step2MortgageProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
       
-      {/* Intro Header */}
-      <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Dark Navy Step 2 Header Banner with Distinctive Celeste Badge */}
+      <div className="bg-[#091C2C] text-[#F6F4EF] rounded-2xl p-6 sm:p-7 border border-[#38BDF8]/40 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-mono uppercase tracking-widest text-[#D8B66D] font-bold">
-            Paso 2 de 4 · Estructura de Capital & Crédito
-          </span>
-          <h2 className="font-serif-title text-2xl font-bold text-[#091C2C] mt-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0284C7] text-white font-mono text-xs font-black uppercase tracking-wider mb-2.5 shadow-md ring-2 ring-[#38BDF8]/60">
+            <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-pulse"></span>
+            <span>PASO 2 DE 4: FINANCIAMIENTO & CRÉDITO</span>
+          </div>
+          <h2 className="font-serif-title text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Tus Números: Hipoteca y Financiamiento Bancario
           </h2>
-          <p className="text-xs sm:text-sm text-[#6F6456] mt-1 max-w-2xl">
-            Simula las condiciones de tu crédito hipotecario en el sistema financiero peruano con el sistema francés, seguro de desgravamen y seguro de todo riesgo.
+          <p className="text-xs sm:text-sm text-[#DDD5C3]/90 mt-1 max-w-2xl leading-relaxed">
+            Simula las condiciones de tu crédito hipotecario en el sistema bancario peruano (sistema francés, Tasa Efectiva Anual, desgravamen y seguro todo riesgo).
           </p>
         </div>
 
         {/* Loan Balance Badge */}
-        <div className="p-3 bg-[#FBF9F5] rounded-xl border border-[#DDD5C3] text-right">
-          <span className="text-[11px] text-[#6F6456] block">Saldo a financiar</span>
-          <span className="font-mono font-bold text-base text-[#091C2C]">
+        <div className="p-3.5 bg-white/10 rounded-xl border border-sky-400/40 text-right backdrop-blur-xs shrink-0">
+          <span className="text-[11px] text-[#38BDF8] uppercase font-mono font-bold block">Saldo a financiar</span>
+          <span className="font-mono font-bold text-lg text-white">
             {isContado ? 'S/. 0 (Al Contado)' : formatCurrency(results.loanAmount, property.currency)}
           </span>
+        </div>
+      </div>
+
+      {/* Quick Price & Down Payment Summary in Step 2 */}
+      <div className="bg-[#F8F7F3] rounded-2xl p-4 sm:p-5 border border-[#DDD5C3] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex-1">
+          <label className="text-xs font-bold text-[#081827] flex items-center gap-1.5 mb-1">
+            <span>Precio de Compra del Inmueble:</span>
+            <span className="text-[10px] text-[#0284C7] bg-white px-1.5 py-0.5 rounded font-mono font-bold border border-sky-200">
+              Editable
+            </span>
+          </label>
+          <EditablePriceInput
+            value={property.purchasePrice}
+            onChange={(val) => onChange({ purchasePrice: val })}
+            currency={property.currency}
+            placeholder={property.currency === 'PEN' ? 'ej. 385000' : 'ej. 145000'}
+            quickIncrements={property.currency === 'PEN' ? [-10000, 10000, 50000] : [-5000, 5000, 20000]}
+            inputClassName="py-1.5 text-sm font-bold"
+          />
+        </div>
+
+        <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-[#DDD5C3] text-xs font-mono shrink-0">
+          <div>
+            <span className="text-[#6F6456] block text-[10px]">Cuota Inicial ({property.downPaymentPct}%)</span>
+            <span className="font-bold text-[#081827] text-sm">
+              {formatCurrency(results.downPaymentAmount, property.currency)}
+            </span>
+          </div>
+          <div className="w-px h-8 bg-[#DDD5C3]"></div>
+          <div>
+            <span className="text-[#6F6456] block text-[10px]">Préstamo Solicitado</span>
+            <span className="font-bold text-[#0284C7] text-sm">
+              {formatCurrency(results.loanAmount, property.currency)}
+            </span>
+          </div>
         </div>
       </div>
 

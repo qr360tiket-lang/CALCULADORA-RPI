@@ -14,7 +14,7 @@ export function calculateAlcabala(
   purchasePrice: number,
   currency: 'USD' | 'PEN',
   exchangeRate: number,
-  uitValuePen: number = 5350,
+  uitValuePen: number = 5500,
   isFirstSaleConstructor: boolean = false,
   manualAlcabala: number | null = null,
   manualEnabled: boolean = false

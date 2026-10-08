@@ -16,6 +16,7 @@ import {
 import { PropertyData, FinancialCalculationResult, PropertyType } from '../types/realEstate';
 import { formatCurrency, formatNumber, PERUVIAN_DISTRICTS } from '../utils/formatters';
 import { InfoTooltip } from './InfoTooltip';
+import { EditablePriceInput } from './EditablePriceInput';
 
 interface Step1PropertyProps {
   property: PropertyData;
@@ -65,8 +66,9 @@ export const Step1Property: React.FC<Step1PropertyProps> = ({
       
       {/* Dark Navy Step Header Banner (Exact design from screenshot) */}
       <div className="bg-[#091C2C] text-[#F6F4EF] rounded-2xl p-6 sm:p-7 border border-[#D8B66D]/30 shadow-md">
-        <div className="inline-block px-3 py-1 rounded-md bg-white/10 text-[#D8B66D] font-mono text-xs font-bold uppercase tracking-wider mb-2.5">
-          PASO 1 DE 3
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0284C7] text-white font-mono text-xs font-black uppercase tracking-wider mb-2.5 shadow-md ring-2 ring-[#38BDF8]/60">
+          <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-pulse"></span>
+          <span>PASO 1 DE 4: PROPIEDAD & GASTOS INICIALES</span>
         </div>
         <h2 className="font-serif-title text-2xl sm:text-3xl font-bold text-white tracking-tight">
           Datos de la Propiedad e Inversión Inicial
@@ -189,20 +191,15 @@ export const Step1Property: React.FC<Step1PropertyProps> = ({
               </div>
             </div>
 
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-base text-[#D8B66D]">
-                {property.currency === 'PEN' ? 'S/.' : '$'}
-              </span>
-              <input
-                type="number"
-                min="0"
-                step="1000"
-                value={property.purchasePrice || ''}
-                onChange={(e) => onChange({ purchasePrice: Math.max(0, parseFloat(e.target.value) || 0) })}
-                placeholder="ej. 385000"
-                className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-lg font-bold text-[#081827] focus:bg-white focus:outline-none focus:border-[#D8B66D]"
-              />
-            </div>
+            <EditablePriceInput
+              value={property.purchasePrice}
+              onChange={(val) => onChange({ purchasePrice: val })}
+              currency={property.currency}
+              placeholder={property.currency === 'PEN' ? 'ej. 385000' : 'ej. 145000'}
+              quickIncrements={property.currency === 'PEN' ? [-10000, 10000, 50000] : [-5000, 5000, 20000]}
+              presets={property.currency === 'PEN' ? [250000, 385000, 480000, 620000] : [75000, 120000, 160000, 220000]}
+              inputClassName="text-lg font-black text-[#081827]"
+            />
 
             {/* Calculated price per m2 */}
             <div className="flex items-center justify-between text-xs text-[#6F6456] font-mono px-1">
@@ -396,7 +393,7 @@ export const Step1Property: React.FC<Step1PropertyProps> = ({
                 <span>Impuesto de Alcabala (Municipalidad)</span>
                 <InfoTooltip
                   title="Impuesto de Alcabala (Perú)"
-                  content="Tributo del 3% sobre el valor de transferencia que exceda las 10 UIT (S/. 53,500 en 2026). La primera venta del constructor (estreno) está totalmente inafecta."
+                  content="Tributo del 3% sobre el valor de transferencia que exceda las 10 UIT (S/. 55,000 con UIT de S/. 5,500). La primera venta del constructor (estreno) está totalmente inafecta."
                   badge="Ley D. Leg. 776"
                 />
               </span>

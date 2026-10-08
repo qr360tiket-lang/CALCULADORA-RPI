@@ -13,11 +13,13 @@ import {
   Building,
   Wrench,
   HelpCircle,
-  Coins
+  Coins,
+  Edit3
 } from 'lucide-react';
 import { PropertyData, FinancialCalculationResult, RentalStrategyType } from '../types/realEstate';
 import { formatCurrency, formatPct } from '../utils/formatters';
 import { InfoTooltip } from './InfoTooltip';
+import { EditablePriceInput } from './EditablePriceInput';
 
 interface Step3RentalProps {
   property: PropertyData;
@@ -65,26 +67,130 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
       
-      {/* Intro Header */}
-      <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Dark Navy Step 3 Header Banner with Distinctive Celeste & Green Badges */}
+      <div className="bg-[#091C2C] text-[#F6F4EF] rounded-2xl p-6 sm:p-7 border border-[#38BDF8]/40 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[11px] font-mono uppercase tracking-widest text-[#D8B66D] font-bold">
-            Paso 3 de 4 · Generación de Renta & Costos de Operación
-          </span>
-          <h2 className="font-serif-title text-2xl font-bold text-[#091C2C] mt-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0284C7] text-white font-mono text-xs font-black uppercase tracking-wider mb-2.5 shadow-md ring-2 ring-[#38BDF8]/60">
+            <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-pulse"></span>
+            <span>PASO 3 DE 4: RENTA & GASTOS OPERATIVOS</span>
+          </div>
+          <h2 className="font-serif-title text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Estrategia de Renta y Gastos Recurrentes
           </h2>
-          <p className="text-xs sm:text-sm text-[#6F6456] mt-1 max-w-2xl">
-            Modela tus flujos de ingreso por alquiler (Tradicional vs Airbnb) y descuenta los gastos reales: mantenimiento de edificio, predial/arbitrios y el 5% de SUNAT (1ra Categoría).
+          <p className="text-xs sm:text-sm text-[#DDD5C3]/90 mt-1 max-w-2xl leading-relaxed">
+            Modela tus ingresos por alquiler mensual o Airbnb, edita los precios libremente y descuenta mantenimiento, predial y el 5% de SUNAT (1ra Categoría).
           </p>
         </div>
 
-        {/* Live Gross Revenue Badge */}
-        <div className="p-3 bg-[#FBF9F5] rounded-xl border border-[#DDD5C3] text-right">
-          <span className="text-[11px] text-[#6F6456] block">Ingreso Bruto Mensual</span>
-          <span className="font-mono font-bold text-base text-[#091C2C]">
-            {formatCurrency(results.grossMonthlyIncome, property.currency)}
-          </span>
+        {/* Live Badges: Purchase Price & Gross Revenue */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="p-3 bg-white/10 rounded-xl border border-sky-400/40 text-right backdrop-blur-xs">
+            <span className="text-[10px] text-[#38BDF8] uppercase font-mono font-bold block flex items-center justify-end gap-1">
+              <span>Precio Inmueble</span>
+              <span className="text-[9px] bg-sky-500/30 text-sky-200 px-1 py-0.2 rounded font-sans">Editable</span>
+            </span>
+            <span className="font-mono font-bold text-sm text-white">
+              {property.purchasePrice > 0 ? formatCurrency(property.purchasePrice, property.currency) : 'S/. 0 (Ingresar abajo)'}
+            </span>
+          </div>
+
+          <div className="p-3 bg-white/10 rounded-xl border border-emerald-400/40 text-right backdrop-blur-xs">
+            <span className="text-[10px] text-[#34D399] uppercase font-mono font-bold block">Ingreso Bruto Mensual</span>
+            <span className="font-mono font-bold text-base text-white">
+              {formatCurrency(results.grossMonthlyIncome, property.currency)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* TARJETA DESTACADA: PRECIO DE COMPRA DEL INMUEBLE (100% EDITABLE DIRECTAMENTE EN ESTE PASO) */}
+      <div className="bg-gradient-to-r from-sky-50 via-white to-blue-50/50 rounded-2xl p-5 sm:p-6 border-2 border-[#0284C7]/50 shadow-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-200/80">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 rounded-xl bg-[#0284C7] text-white shadow-sm shrink-0">
+              <Coins className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-serif-title font-bold text-base sm:text-lg text-[#081827]">
+                  Precio de Compra del Inmueble
+                </h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white font-mono text-[10px] font-black uppercase tracking-wider shadow-2xs">
+                  ✓ 100% EDITABLE AQUÍ
+                </span>
+              </div>
+              <p className="text-xs text-[#6F6456]">
+                Escribe directamente el monto que acordaste o deseas simular sin regresar al Paso 1.
+              </p>
+            </div>
+          </div>
+
+          {/* Currency Toggle */}
+          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-sky-300 shadow-2xs self-start sm:self-auto">
+            <span className="text-[11px] font-mono text-[#6F6456] px-1.5 font-bold">Moneda:</span>
+            <button
+              type="button"
+              onClick={() => onChange({ currency: 'PEN' })}
+              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                property.currency === 'PEN'
+                  ? 'bg-[#0284C7] text-white shadow-xs'
+                  : 'text-[#081827] hover:bg-slate-100'
+              }`}
+            >
+              Soles (S/.)
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange({ currency: 'USD' })}
+              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                property.currency === 'USD'
+                  ? 'bg-[#0284C7] text-white shadow-xs'
+                  : 'text-[#081827] hover:bg-slate-100'
+              }`}
+            >
+              Dólares ($)
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+          <div className="lg:col-span-7">
+            <label className="block text-xs font-black text-[#081827] mb-1.5 uppercase tracking-wide">
+              Monto del Precio de Compra:
+            </label>
+            <EditablePriceInput
+              value={property.purchasePrice}
+              onChange={(val) => onChange({ purchasePrice: val })}
+              currency={property.currency}
+              placeholder={property.currency === 'PEN' ? 'ej. 385000' : 'ej. 145000'}
+              quickIncrements={property.currency === 'PEN' ? [-10000, 10000, 50000] : [-5000, 5000, 20000]}
+              presets={property.currency === 'PEN' ? [250000, 385000, 480000, 620000] : [75000, 120000, 160000, 220000]}
+              inputClassName="text-lg font-black text-[#081827]"
+            />
+          </div>
+
+          <div className="lg:col-span-5 bg-white p-3.5 rounded-xl border border-sky-200/90 space-y-2 text-xs font-mono shadow-2xs">
+            <div className="flex justify-between items-center text-[#6F6456]">
+              <span>Cuota Inicial ({property.downPaymentPct}%):</span>
+              <span className="font-bold text-[#081827] text-sm">
+                {formatCurrency(results.downPaymentAmount, property.currency)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-[#6F6456]">
+              <span>Saldo a Financiar:</span>
+              <span className="font-bold text-[#0284C7] text-sm">
+                {formatCurrency(results.loanAmount, property.currency)}
+              </span>
+            </div>
+            {property.areaM2 > 0 && (
+              <div className="flex justify-between items-center text-[#6F6456] pt-1.5 border-t border-slate-100">
+                <span>Precio por m² ({property.areaM2} m²):</span>
+                <span className="font-bold text-[#081827]">
+                  {formatCurrency(results.pricePerM2, property.currency)}/m²
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -100,21 +206,21 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
           <button
             type="button"
             onClick={() => onChange({ rentalStrategy: 'tradicional' })}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
+            className={`p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
               isTraditional
-                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md'
+                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md ring-2 ring-[#0284C7]'
                 : 'bg-[#FBF9F5] text-[#091C2C] border-[#DDD5C3] hover:border-[#D8B66D]'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Home className={`w-5 h-5 ${isTraditional ? 'text-[#D8B66D]' : 'text-[#091C2C]'}`} />
+                <Home className={`w-5 h-5 ${isTraditional ? 'text-[#38BDF8]' : 'text-[#091C2C]'}`} />
                 <span className="font-serif-title font-bold text-base">
                   Renta Tradicional (Largo Plazo)
                 </span>
               </div>
               {isTraditional && (
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#D8B66D] text-[#091C2C] font-bold">
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#0284C7] text-white font-black">
                   Activo
                 </span>
               )}
@@ -128,21 +234,21 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
           <button
             type="button"
             onClick={() => onChange({ rentalStrategy: 'airbnb' })}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
+            className={`p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
               !isTraditional
-                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md'
+                ? 'bg-[#091C2C] text-[#F6F4EF] border-[#091C2C] shadow-md ring-2 ring-[#0284C7]'
                 : 'bg-[#FBF9F5] text-[#091C2C] border-[#DDD5C3] hover:border-[#D8B66D]'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Sparkles className={`w-5 h-5 ${!isTraditional ? 'text-[#D8B66D]' : 'text-[#091C2C]'}`} />
+                <Sparkles className={`w-5 h-5 ${!isTraditional ? 'text-[#38BDF8]' : 'text-[#091C2C]'}`} />
                 <span className="font-serif-title font-bold text-base">
                   Renta Corta / Airbnb / Booking
                 </span>
               </div>
               {!isTraditional && (
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#D8B66D] text-[#091C2C] font-bold">
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#0284C7] text-white font-black">
                   Activo
                 </span>
               )}
@@ -160,35 +266,44 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
         
         {/* Card Left: Revenue Parameters */}
         <div className="bg-white rounded-2xl p-6 border border-[#DDD5C3] shadow-xs space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-[#DDD5C3]/40">
-            <Coins className="w-5 h-5 text-[#D8B66D]" />
-            <h3 className="font-serif-title font-bold text-lg text-[#091C2C]">
-              {isTraditional ? 'Parámetros de Alquiler Tradicional' : 'Parámetros de Renta Vacacional / Airbnb'}
-            </h3>
+          <div className="flex items-center justify-between pb-3 border-b border-[#DDD5C3]/40">
+            <div className="flex items-center gap-2">
+              <Coins className="w-5 h-5 text-[#0284C7]" />
+              <h3 className="font-serif-title font-bold text-lg text-[#091C2C]">
+                {isTraditional ? 'Precio de Alquiler Tradicional' : 'Tarifas de Renta Airbnb'}
+              </h3>
+            </div>
+            <span className="text-[11px] font-mono font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+              100% Editable
+            </span>
           </div>
 
           {isTraditional ? (
             /* Traditional inputs */
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#091C2C] mb-1.5 flex items-center justify-between">
-                  <span>Alquiler mensual pactado</span>
-                  <span className="text-[10px] text-[#6F6456] font-normal">Valor de mercado</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-[#D8B66D]">
-                    {property.currency === 'USD' ? '$' : 'S/.'}
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-[#091C2C] flex items-center gap-1">
+                    <span>Precio de Alquiler Mensual Pactado</span>
+                    <InfoTooltip 
+                      title="Alquiler Mensual"
+                      content="Renta bruta mensual que pagará el inquilino según el contrato de arrendamiento."
+                    />
+                  </label>
+                  <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-mono font-bold">
+                    Renta mensual
                   </span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="50"
-                    value={property.traditionalRentMonthly || ''}
-                    onChange={(e) => onChange({ traditionalRentMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-base font-bold text-[#091C2C] focus:bg-white focus:outline-none focus:border-[#D8B66D]"
-                    placeholder="ej. 2200"
-                  />
                 </div>
+
+                <EditablePriceInput
+                  value={property.traditionalRentMonthly}
+                  onChange={(val) => onChange({ traditionalRentMonthly: val })}
+                  currency={property.currency}
+                  placeholder={property.currency === 'PEN' ? 'ej. 2200' : 'ej. 750'}
+                  quickIncrements={property.currency === 'PEN' ? [-100, 100, 500] : [-50, 50, 150]}
+                  presets={property.currency === 'PEN' ? [1800, 2200, 2600, 3200] : [550, 750, 950, 1200]}
+                  inputClassName="text-base font-bold text-[#081827]"
+                />
               </div>
 
               {/* Vacancy Rate */}
@@ -230,45 +345,40 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
           ) : (
             /* Airbnb inputs */
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-[#091C2C] mb-1">
-                    Tarifa promedio por noche (ADR)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono font-bold text-[#D8B66D]">
-                      {property.currency === 'USD' ? '$' : 'S/.'}
-                    </span>
-                    <input
-                      type="number"
-                      min="10"
-                      value={property.airbnbPricePerNight || ''}
-                      onChange={(e) => onChange({ airbnbPricePerNight: Math.max(0, parseFloat(e.target.value) || 0) })}
-                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-sm font-bold text-[#091C2C] focus:bg-white focus:outline-none focus:border-[#D8B66D]"
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#091C2C] mb-1">
+                  Tarifa promedio por noche (ADR)
+                </label>
+                <EditablePriceInput
+                  value={property.airbnbPricePerNight}
+                  onChange={(val) => onChange({ airbnbPricePerNight: val })}
+                  currency={property.currency}
+                  placeholder={property.currency === 'PEN' ? 'ej. 160' : 'ej. 55'}
+                  quickIncrements={property.currency === 'PEN' ? [-20, 20, 50] : [-10, 10, 25]}
+                  presets={property.currency === 'PEN' ? [100, 140, 180, 240] : [35, 50, 75, 110]}
+                  inputClassName="text-sm font-bold text-[#081827]"
+                />
+              </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-[#091C2C]">
-                      Ocupación mensual
-                    </label>
-                    <span className="text-xs font-mono font-bold text-[#091C2C]">{property.airbnbOccupancyPct}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="20"
-                    max="95"
-                    step="1"
-                    value={property.airbnbOccupancyPct}
-                    onChange={(e) => onChange({ airbnbOccupancyPct: Number(e.target.value) })}
-                    className="w-full accent-[#091C2C] cursor-pointer mt-2"
-                  />
-                  <span className="text-[10px] text-[#6F6456] font-mono block text-right">
-                    ~{(30.4 * property.airbnbOccupancyPct / 100).toFixed(0)} noches ocupadas
-                  </span>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-[#091C2C]">
+                    Ocupación mensual
+                  </label>
+                  <span className="text-xs font-mono font-bold text-[#091C2C]">{property.airbnbOccupancyPct}%</span>
                 </div>
+                <input
+                  type="range"
+                  min="20"
+                  max="95"
+                  step="1"
+                  value={property.airbnbOccupancyPct}
+                  onChange={(e) => onChange({ airbnbOccupancyPct: Number(e.target.value) })}
+                  className="w-full accent-[#091C2C] cursor-pointer mt-2"
+                />
+                <span className="text-[10px] text-[#6F6456] font-mono block text-right">
+                  ~{(30.4 * property.airbnbOccupancyPct / 100).toFixed(0)} noches ocupadas
+                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -284,7 +394,7 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
                       onChange={(e) => onChange({ airbnbPlatformFeePct: Math.max(0, parseFloat(e.target.value) || 0) })}
                       className="w-20 px-2 py-1.5 rounded-lg border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-xs font-bold text-[#091C2C]"
                     />
-                    <span className="text-xs font-bold text-[#6F6456]">% (3% host split fee)</span>
+                    <span className="text-xs font-bold text-[#6F6456]">% (3% host fee)</span>
                   </div>
                 </div>
 
@@ -292,17 +402,13 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
                   <label className="block text-xs font-semibold text-[#091C2C] mb-1">
                     Limpieza cobrada al huésped / mes
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-[#D8B66D]">
-                      {property.currency === 'USD' ? '$' : 'S/.'}
-                    </span>
-                    <input
-                      type="number"
-                      value={property.airbnbCleaningFeePerMonth || ''}
-                      onChange={(e) => onChange({ airbnbCleaningFeePerMonth: Math.max(0, parseFloat(e.target.value) || 0) })}
-                      className="w-full pl-8 pr-2 py-1.5 rounded-lg border border-[#DDD5C3] bg-[#FBF9F5] font-mono text-xs font-bold text-[#091C2C]"
-                    />
-                  </div>
+                  <EditablePriceInput
+                    value={property.airbnbCleaningFeePerMonth}
+                    onChange={(val) => onChange({ airbnbCleaningFeePerMonth: val })}
+                    currency={property.currency}
+                    placeholder="0"
+                    inputClassName="text-xs font-bold text-[#081827] py-1.5"
+                  />
                 </div>
               </div>
 
@@ -383,17 +489,13 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
                 </label>
                 <span className="text-[11px] text-[#6F6456]">Portería, luz áreas comunes, limpieza</span>
               </div>
-              <div className="relative w-32">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
-                  {property.currency === 'USD' ? '$' : 'S/.'}
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  value={property.maintenanceFeeMonthly || ''}
-                  onChange={(e) => onChange({ maintenanceFeeMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
-                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg focus:bg-white"
+              <div className="w-36">
+                <EditablePriceInput
+                  value={property.maintenanceFeeMonthly}
+                  onChange={(val) => onChange({ maintenanceFeeMonthly: val })}
+                  currency={property.currency}
                   placeholder="ej. 200"
+                  inputClassName="py-1.5 text-xs text-right"
                 />
               </div>
             </div>
@@ -410,17 +512,13 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
                 </label>
                 <span className="text-[11px] text-[#6F6456]">Municipalidad del distrito (SAT) al mes</span>
               </div>
-              <div className="relative w-32">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
-                  {property.currency === 'USD' ? '$' : 'S/.'}
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  value={property.propertyTaxAndArbitriosMonthly || ''}
-                  onChange={(e) => onChange({ propertyTaxAndArbitriosMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
-                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg focus:bg-white"
+              <div className="w-36">
+                <EditablePriceInput
+                  value={property.propertyTaxAndArbitriosMonthly}
+                  onChange={(val) => onChange({ propertyTaxAndArbitriosMonthly: val })}
+                  currency={property.currency}
                   placeholder="ej. 80"
+                  inputClassName="py-1.5 text-xs text-right"
                 />
               </div>
             </div>
@@ -483,17 +581,13 @@ export const Step3Rental: React.FC<Step3RentalProps> = ({
                 </label>
                 <span className="text-[11px] text-[#6F6456]">Asumido por anfitrión en Airbnb o alquiler todo incluido</span>
               </div>
-              <div className="relative w-32">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-[#D8B66D]">
-                  {property.currency === 'USD' ? '$' : 'S/.'}
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  value={property.utilitiesMonthly || ''}
-                  onChange={(e) => onChange({ utilitiesMonthly: Math.max(0, parseFloat(e.target.value) || 0) })}
-                  className="w-full pl-8 pr-2 py-1.5 font-mono text-xs font-semibold text-right bg-[#FBF9F5] border border-[#DDD5C3] rounded-lg"
+              <div className="w-36">
+                <EditablePriceInput
+                  value={property.utilitiesMonthly}
+                  onChange={(val) => onChange({ utilitiesMonthly: val })}
+                  currency={property.currency}
                   placeholder="0"
+                  inputClassName="py-1.5 text-xs text-right"
                 />
               </div>
             </div>

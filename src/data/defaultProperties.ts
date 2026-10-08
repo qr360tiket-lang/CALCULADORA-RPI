@@ -13,7 +13,7 @@ export function createCleanBlankProperty(): PropertyData {
     exchangeRate: 3.75,
     downPaymentPct: 20,
     isFirstSaleConstructor: false,
-    uitValuePen: 5350,
+    uitValuePen: 5500,
     customAlcabala: null,
     manualAlcabalaEnabled: false,
     notaryFee: 0,
@@ -61,7 +61,7 @@ export const SAMPLE_FICTITIOUS_PROPERTY: PropertyData = {
   exchangeRate: 3.75,
   downPaymentPct: 20,
   isFirstSaleConstructor: false,
-  uitValuePen: 5350,
+  uitValuePen: 5500,
   customAlcabala: null,
   manualAlcabalaEnabled: false,
   notaryFee: 1155,
@@ -110,7 +110,7 @@ export const INITIAL_CLEAN_PROPERTY: PropertyData = {
   exchangeRate: 3.75,
   downPaymentPct: 20,
   isFirstSaleConstructor: false,
-  uitValuePen: 5350,
+  uitValuePen: 5500,
   customAlcabala: null,
   manualAlcabalaEnabled: false,
   notaryFee: 0,
@@ -160,7 +160,7 @@ export const DEFAULT_PROPERTIES: PropertyData[] = [
     exchangeRate: 3.75,
     downPaymentPct: 20,
     isFirstSaleConstructor: false,
-    uitValuePen: 5350,
+    uitValuePen: 5500,
     customAlcabala: null,
     manualAlcabalaEnabled: false,
     notaryFee: 420,
@@ -209,7 +209,7 @@ export const DEFAULT_PROPERTIES: PropertyData[] = [
     exchangeRate: 3.75,
     downPaymentPct: 25,
     isFirstSaleConstructor: true, // Estreno: Sin Alcabala
-    uitValuePen: 5350,
+    uitValuePen: 5500,
     customAlcabala: null,
     manualAlcabalaEnabled: false,
     notaryFee: 380,
@@ -258,7 +258,7 @@ export const DEFAULT_PROPERTIES: PropertyData[] = [
     exchangeRate: 3.75,
     downPaymentPct: 15,
     isFirstSaleConstructor: false,
-    uitValuePen: 5350,
+    uitValuePen: 5500,
     customAlcabala: null,
     manualAlcabalaEnabled: false,
     notaryFee: 1260,
@@ -296,8 +296,8 @@ export const DEFAULT_PROPERTIES: PropertyData[] = [
   },
 ];
 
-const STORAGE_KEY = 'calculadora_inmobiliaria_peru_properties_v2';
-const ACTIVE_PROP_KEY = 'calculadora_inmobiliaria_peru_active_id_v2';
+const STORAGE_KEY = 'calculadora_inmobiliaria_peru_properties_v3';
+const ACTIVE_PROP_KEY = 'calculadora_inmobiliaria_peru_active_id_v3';
 
 export function loadSavedProperties(): PropertyData[] {
   try {
